@@ -1,8 +1,18 @@
-# logseq-pdf-translator
-A PDF mouse hover translator.
+<p align="center">
+  <a href="https://github.com/ZYJ-3721/logseq-pdf-translator" alt="Logseq Logo">
+    <img src="./logo.svg" height="300"/>
+  </a>
+</p>
+
+<h1 align="center"> logseq-pdf-translator </h1>
+
+<h4 align="center"> A PDF mouse hover translator. </h4>
 
 ## Demo
 ![](./demo.gif)
+
+## Install
+![](./install.gif)
 
 ## Settings
 ![](./settings.png)
