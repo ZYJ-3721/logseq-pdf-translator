@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/ZYJ-3721/logseq-pdf-translator" alt="Logseq Logo">
+  <a href="https://github.com/ZYJ-3721/logseq-pdf-translator">
     <img src="./logo.svg" height="300"/>
   </a>
 </p>
