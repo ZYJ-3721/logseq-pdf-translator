@@ -3,6 +3,7 @@ import type { TranslatorState, PanelRef } from "./types";
 import { SELECTORS, PANEL_CONFIG, GLOBAL_STATE_KEY } from "./configs";
 import { ExternalWindow } from "./ExternalWindow";
 import { PANEL_STYLES } from "./styles";
+import { normalizeHorizontalPosition, normalizeVerticalPosition, t } from "./i18n";
 import { 
   getTargetDocument, 
   getAllDocuments, 
@@ -117,7 +118,7 @@ function App() {
         const targetDoc = getTargetDocument();
         const success = enableTranslatorRef.current?.(false, targetDoc);
         if (!success) {
-          showNotification("启用翻译失败", "error");
+          showNotification(t("notifications.translatorEnableFailed"), "error");
           return;
         }
         syncButtonStatesRef.current?.(true);
@@ -224,9 +225,9 @@ function App() {
       const widthRatio = Math.max(0.1, Math.min(1.0, parseFloat(settings.panelWidthRatio) || 0.5));
       const heightRatio = Math.max(0.1, Math.min(1.0, parseFloat(settings.panelHeightRatio) || 0.25));
       
-      const horizontalPosition = settings.panelHorizontalPosition ?? "左侧";
+      const horizontalPosition = normalizeHorizontalPosition(settings.panelHorizontalPosition);
       const horizontalMargin = parseInt(settings.panelHorizontalMargin) || 0;
-      const verticalPosition = settings.panelVerticalPosition ?? "底部";
+      const verticalPosition = normalizeVerticalPosition(settings.panelVerticalPosition);
       const verticalMargin = parseInt(settings.panelVerticalMargin) || 0;
       
       const defaultWidth = Math.floor(viewerRect.width * widthRatio);
@@ -241,7 +242,7 @@ function App() {
         minHeight: `${PANEL_CONFIG.MIN_HEIGHT}px`
       };
       
-      if (horizontalPosition === "左侧") {
+      if (horizontalPosition === "left") {
         panelStyle.left = `${horizontalMargin}px`;
         panelStyle.right = 'auto';
       } else {
@@ -249,7 +250,7 @@ function App() {
         panelStyle.left = 'auto';
       }
       
-      if (verticalPosition === "底部") {
+      if (verticalPosition === "bottom") {
         panelStyle.bottom = `${verticalMargin}px`;
         panelStyle.top = 'auto';
       } else {
@@ -259,16 +260,16 @@ function App() {
 
       Object.assign(panel.style, panelStyle);
       
-      const content = initialContent || '选中文本以查看翻译';
+      const content = initialContent || t("panel.placeholder");
       const fontSize = PANEL_CONFIG.DEFAULT_FONT_SIZE;
       
       panel.innerHTML = `
         <div class="pdf-translator-panel-header">
-          <span class="pdf-translator-panel-title">翻译结果</span>
+          <span class="pdf-translator-panel-title">${t("panel.title")}</span>
           <div class="pdf-translator-font-size-controls">
-            <button class="pdf-translator-font-size-btn" data-action="decrease" title="减小字体">A-</button>
+            <button class="pdf-translator-font-size-btn" data-action="decrease" title="${t("panel.decreaseFont")}">A-</button>
             <span class="pdf-translator-font-size-label">${fontSize}px</span>
-            <button class="pdf-translator-font-size-btn" data-action="increase" title="增大字体">A+</button>
+            <button class="pdf-translator-font-size-btn" data-action="increase" title="${t("panel.increaseFont")}">A+</button>
           </div>
         </div>
         <div class="pdf-translator-panel-content" style="font-size: ${fontSize}px;">${content}</div>
@@ -509,7 +510,7 @@ function App() {
       contentDiv.innerHTML = `
         <div class="pdf-translator-loading">
           <div class="pdf-translator-spinner"></div>
-          <span>翻译中...</span>
+          <span>${t("panel.loading")}</span>
         </div>
       `;
 
@@ -520,9 +521,9 @@ function App() {
         `;
         saveState();
       } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : "未知错误";
+        const errorMsg = error instanceof Error ? error.message : t("errors.unknownTranslationError");
         contentDiv.innerHTML = `
-          <div class="pdf-translator-error">❌ 翻译失败: ${errorMsg}</div>
+          <div class="pdf-translator-error">${t("errors.translationFailedPrefix", { message: errorMsg })}</div>
         `;
         saveState();
       }
@@ -698,7 +699,7 @@ function App() {
     const createButton = (doc: Document, onClick: (willEnable: boolean) => void, isActive: boolean = false): HTMLElement => {
       const button = doc.createElement("a");
       button.className = "button pdf-translator-toggle-btn";
-      button.title = "Text Translator";
+      button.title = t("panel.buttonTitle");
       
       button.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
@@ -753,7 +754,7 @@ function App() {
             pdfContainer = targetDoc.querySelector(SELECTORS.PDF_VIEWER);
             
             if (!pdfContainer) {
-              showNotification("PDF 未加载或已关闭", "error");
+              showNotification(t("notifications.pdfViewerNotFound"), "error");
               syncButtonStates(false);
               return;
             }
@@ -763,15 +764,15 @@ function App() {
           const success = enableTranslator(restoreFromState, targetDoc);
           
           if (success) {
-            showNotification("划词翻译已启用");
+            showNotification(t("notifications.translatorEnabled"));
             syncButtonStates(true);
           } else {
-            showNotification("启用翻译失败", "error");
+            showNotification(t("notifications.translatorEnableFailed"), "error");
             syncButtonStates(false);
           }
         } else {
           disableTranslator(false);
-          showNotification("划词翻译已关闭");
+          showNotification(t("notifications.translatorDisabled"));
           syncButtonStates(false);
         }
       }, shouldEnable);
