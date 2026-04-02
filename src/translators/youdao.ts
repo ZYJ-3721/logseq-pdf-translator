@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 // 生成 SHA256 签名
 async function sha256(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
@@ -70,29 +71,29 @@ export async function youdaoTranslator(
 
     // 检查请求状态
     if (!response.ok) {
-      throw new Error(`请求错误: ${response.status}`);
+      throw new Error(t("errors.requestFailed", { status: response.status }));
     }
     // 获取请求结果
     const result: YoudaoTranslateResponse = await response.json();
 
     // 检查是否有错误码
     if (result.errorCode !== "0") {
-      throw new Error(`有道翻译错误 ${result.errorCode}`);
+      throw new Error(t("errors.youdaoApiErrorPrefix", { code: result.errorCode }));
     }
     // 检查翻译结果
     if (!result.translation || !Array.isArray(result.translation) || result.translation.length === 0) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     // 拼接所有翻译结果
     const translation = result.translation.join("");
 
     if (!translation) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     return translation;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error("网络请求失败，请检查网络连接");
+      throw new Error(t("errors.networkRequestFailed"));
     }
     throw error;
   }

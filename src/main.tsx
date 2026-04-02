@@ -3,111 +3,182 @@ import App from "./App";
 import React from "react";
 import { PANEL_STYLES } from "./styles";
 import * as ReactDOM from "react-dom/client";
-import { TRANSLATION_SERVICES, TranslationService } from "./translators/index";
+import {
+  getCurrentLocale,
+  getHorizontalPositionLabel,
+  getHorizontalPositionOptions,
+  getLanguageLabel,
+  getLanguageOptions,
+  getLocaleDictionary,
+  getVerticalPositionLabel,
+  getVerticalPositionOptions,
+  normalizeHorizontalPosition,
+  normalizeLocale,
+  normalizeVerticalPosition,
+  t,
+} from "./i18n";
+import {
+  getTranslationServiceLabel,
+  getTranslationServiceOptions,
+  normalizeTranslationService,
+  TranslationService,
+} from "./translators";
 
-
-const TARGET_LANGUAGE: Record<TranslationService, string> = {
-  "Google": "zh-CN",
-  "百度🔐": "zh",
-  "有道🔐": "zh-CHS",
+const TARGET_LANGUAGE_DEFAULTS: Record<TranslationService, string> = {
+  google: "zh-CN",
+  baidu: "zh",
+  youdao: "zh-CHS",
 };
 
-const TARGET_LANGUAGE_DESCRIPTION: Record<TranslationService, string> = {
-  "Google": "目标语言代码，zh-CN等（见：https://docs.cloud.google.com/translate/docs/languages ）",
-  "百度🔐": "目标语言代码，zh等（见：https://fanyi-api.baidu.com/product/113 ）\n\n目标语言代码&翻译领域类型（见：https://fanyi-api.baidu.com/product/123 ）",
-  "有道🔐": "目标语言代码，zh-CHS等（见：https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html ）\n\n目标语言代码&翻译领域类型（见：https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html ）",
-};
+function getSettingsSchema(locale = getCurrentLocale(), service = normalizeTranslationService((window as any).logseq?.settings?.translationService)) {
+  const dict = getLocaleDictionary(locale);
 
-const API_KEY_DESCRIPTION: Record<TranslationService, string> = {
-  "Google": "不需要",
-  "百度🔐": "APP ID&密钥 （见：https://fanyi-api.baidu.com/manage/developer ）",
-  "有道🔐": "应用ID&应用秘钥（见：https://ai.youdao.com/console ）",
-};
-
-// 动态生成设置架构
-function getSettingsSchema(service: TranslationService) {
   return [
+    {
+      key: "pluginLanguage",
+      type: "enum" as const,
+      title: dict.settings.language.title,
+      description: dict.settings.language.description,
+      enumChoices: getLanguageOptions(),
+      default: getLanguageLabel(locale),
+    },
     {
       key: "translationService",
       type: "enum" as const,
-      title: "翻译服务",
-      description: "翻译服务商",
-      enumChoices: [...TRANSLATION_SERVICES],
-      default: "Google",
+      title: dict.settings.translationService.title,
+      description: dict.settings.translationService.description,
+      enumChoices: getTranslationServiceOptions(locale),
+      default: getTranslationServiceLabel(service, locale),
     },
     {
       key: "targetLanguage",
       type: "string" as const,
-      title: "目标语言",
-      description: TARGET_LANGUAGE_DESCRIPTION[service],
+      title: dict.settings.targetLanguage.title,
+      description: dict.targetLanguageDescriptions[service],
       default: "",
     },
     {
       key: "apiKey",
       type: "string" as const,
-      title: "API Key",
-      description: API_KEY_DESCRIPTION[service],
+      title: dict.settings.apiKey.title,
+      description: dict.apiKeyDescriptions[service],
       default: "",
     },
     {
       key: "panelHorizontalPosition",
       type: "enum" as const,
-      title: "翻译框水平位置",
-      description: "翻译框的初始位置是在左侧还是右侧",
-      enumChoices: ["左侧", "右侧"],
-      default: "左侧",
+      title: dict.settings.panelHorizontalPosition.title,
+      description: dict.settings.panelHorizontalPosition.description,
+      enumChoices: getHorizontalPositionOptions(locale),
+      default: getHorizontalPositionLabel("left", locale),
     },
     {
       key: "panelVerticalPosition",
       type: "enum" as const,
-      title: "翻译框垂直位置",
-      description: "翻译框的初始位置是在顶部还是底部",
-      enumChoices: ["顶部", "底部"],
-      default: "底部",
+      title: dict.settings.panelVerticalPosition.title,
+      description: dict.settings.panelVerticalPosition.description,
+      enumChoices: getVerticalPositionOptions(locale),
+      default: getVerticalPositionLabel("bottom", locale),
     },
     {
       key: "panelHorizontalMargin",
       type: "number" as const,
-      title: "翻译框水平边距",
-      description: "翻译框距离 PDF 查看器左侧或右侧的距离",
+      title: dict.settings.panelHorizontalMargin.title,
+      description: dict.settings.panelHorizontalMargin.description,
       default: 0,
     },
     {
       key: "panelVerticalMargin",
       type: "number" as const,
-      title: "翻译框垂直边距",
-      description: "翻译框距离 PDF 查看器顶部或底部的距离",
+      title: dict.settings.panelVerticalMargin.title,
+      description: dict.settings.panelVerticalMargin.description,
       default: 0,
     },
     {
       key: "panelWidthRatio",
       type: "number" as const,
-      title: "翻译框宽度比例",
-      description: "翻译框宽度占 PDF 查看器宽度的比例（0.1-1.0）",
+      title: dict.settings.panelWidthRatio.title,
+      description: dict.settings.panelWidthRatio.description,
       default: 0.5,
     },
     {
       key: "panelHeightRatio",
       type: "number" as const,
-      title: "翻译框高度比例",
-      description: "翻译框高度占 PDF 查看器高度的比例（0.1-1.0）",
+      title: dict.settings.panelHeightRatio.title,
+      description: dict.settings.panelHeightRatio.description,
       default: 0.25,
     },
   ];
 }
 
+function applyLocalizedSettings() {
+  const settings = (window as any).logseq?.settings ?? {};
+  const locale = normalizeLocale(settings.pluginLanguage);
+  const service = normalizeTranslationService(settings.translationService);
+  const horizontalPosition = normalizeHorizontalPosition(settings.panelHorizontalPosition);
+  const verticalPosition = normalizeVerticalPosition(settings.panelVerticalPosition);
+
+  logseq.useSettingsSchema(getSettingsSchema(locale, service));
+
+  const updates: Record<string, string> = {};
+  const localizedLanguage = getLanguageLabel(locale);
+  const localizedService = getTranslationServiceLabel(service, locale);
+  const localizedHorizontalPosition = getHorizontalPositionLabel(horizontalPosition, locale);
+  const localizedVerticalPosition = getVerticalPositionLabel(verticalPosition, locale);
+
+  if (settings.pluginLanguage !== localizedLanguage) {
+    updates.pluginLanguage = localizedLanguage;
+  }
+  if (settings.translationService !== localizedService) {
+    updates.translationService = localizedService;
+  }
+  if (settings.panelHorizontalPosition !== localizedHorizontalPosition) {
+    updates.panelHorizontalPosition = localizedHorizontalPosition;
+  }
+  if (settings.panelVerticalPosition !== localizedVerticalPosition) {
+    updates.panelVerticalPosition = localizedVerticalPosition;
+  }
+  if (!settings.targetLanguage) {
+    updates.targetLanguage = TARGET_LANGUAGE_DEFAULTS[service];
+  }
+
+  if (Object.keys(updates).length > 0) {
+    logseq.updateSettings(updates);
+  }
+}
+
 function main() {
   // 初始化设置架构
-  const currentService = (logseq.settings?.translationService) as TranslationService;
-  logseq.useSettingsSchema(getSettingsSchema(currentService));
+  applyLocalizedSettings();
   // 监听设置变化，动态更新架构
   logseq.onSettingsChanged((newSettings, oldSettings) => {
-    const newService = newSettings.translationService as TranslationService;
-    const oldService = oldSettings.translationService as TranslationService;
+    const locale = normalizeLocale(newSettings.pluginLanguage);
+    const previousLocale = normalizeLocale(oldSettings.pluginLanguage);
+    const service = normalizeTranslationService(newSettings.translationService);
+    const previousService = normalizeTranslationService(oldSettings.translationService);
+
+    const updates: Record<string, string> = {};
+
+    if (locale !== previousLocale || service !== previousService) {
+      logseq.useSettingsSchema(getSettingsSchema(locale, service));
+      updates.translationService = getTranslationServiceLabel(service, locale);
+      updates.panelHorizontalPosition = getHorizontalPositionLabel(
+        normalizeHorizontalPosition(newSettings.panelHorizontalPosition),
+        locale,
+      );
+      updates.panelVerticalPosition = getVerticalPositionLabel(
+        normalizeVerticalPosition(newSettings.panelVerticalPosition),
+        locale,
+      );
+      updates.pluginLanguage = getLanguageLabel(locale);
+    }
     // 服务商切换时，更新设置架构
-    if (newService !== oldService) {
-      logseq.useSettingsSchema(getSettingsSchema(newService));
-      logseq.updateSettings({targetLanguage: TARGET_LANGUAGE[newService]})
+    if (service !== previousService) {
+      updates.targetLanguage = TARGET_LANGUAGE_DEFAULTS[service];
+    }
+
+    if (Object.keys(updates).some((key) => updates[key] !== newSettings[key])) {
+      logseq.updateSettings(updates);
     }
   });
 
@@ -135,14 +206,14 @@ function main() {
 
   // 注册 PDF 高亮上下文菜单项
   logseq.Editor.registerHighlightContextMenuItem(
-    "翻译",
+    t("menu.translate"),
     async ({ content }) => {
       const event = new CustomEvent("pdf-translator-translate", {
         detail: { text: content?.text || "" },
       });
       window.dispatchEvent(event);
     },
-    { clearSelection: false }
+    { clearSelection: false },
   );
 }
 

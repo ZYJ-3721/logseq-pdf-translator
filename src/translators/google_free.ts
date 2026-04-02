@@ -1,3 +1,5 @@
+
+import { t } from "../i18n";
 /**
  * 生成 Google 翻译 Token (TK)
  * @param text 待翻译文本
@@ -25,7 +27,7 @@ function generateToken(text: string): string {
 
   const e: number[] = [];
   let f = 0;
-  
+
   /* eslint-disable */
   for (let g = 0; g < text.length; g++) {
     let m = text.charCodeAt(g);
@@ -86,17 +88,17 @@ export async function googleFreeTranslator(
     const response = await fetch(url, {
       method: "GET",
     });
-    
+
     // 检查请求状态
     if (!response.ok) {
-      throw new Error(`请求错误: ${response.status}`);
+      throw new Error(t("errors.requestFailed", { status: response.status }));
     }
     // 获取请求结果
     const result = await response.json();
 
     // 检查翻译结果
     if (!result || !Array.isArray(result) || !result[0] || !Array.isArray(result[0])) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     // 拼接所有翻译结果
     let translation = "";
@@ -107,12 +109,12 @@ export async function googleFreeTranslator(
     }
 
     if (!translation) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     return translation;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error("网络请求失败，请检查网络连接");
+      throw new Error(t("errors.networkRequestFailed"));
     }
     throw error;
   }

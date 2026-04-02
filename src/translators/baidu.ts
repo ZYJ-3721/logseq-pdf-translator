@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { MD5 } from "./md5";
 
 
@@ -43,7 +44,7 @@ export async function baiduTranslator(
     appid: appid, salt: salt, sign: sign,
     ...(domain ? { domain } : {}),
   });
-  
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -55,29 +56,34 @@ export async function baiduTranslator(
 
     // 检查请求状态
     if (!response.ok) {
-      throw new Error(`请求错误: ${response.status}`);
+      throw new Error(t("errors.requestFailed", { status: response.status }));
     }
     // 获取请求结果
     const result: BaiduTranslateResponse = await response.json();
 
     // 检查是否有错误码
     if (result.error_code) {
-      throw new Error(`百度翻译错误 ${result.error_code}: ${result.error_msg || "未知错误"}`);
+      throw new Error(
+        t("errors.baiduApiErrorPrefix", {
+          code: result.error_code,
+          message: result.error_msg || t("errors.unknownTranslationError"),
+        }),
+      );
     }
     // 检查翻译结果
     if (!result.trans_result || !Array.isArray(result.trans_result) || result.trans_result.length === 0) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     // 拼接所有翻译结果
     const translation = result.trans_result.map((item) => item.dst).join("");
     
     if (!translation) {
-      throw new Error("翻译结果为空");
+      throw new Error(t("errors.invalidTranslationResult"));
     }
     return translation;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw new Error("网络请求失败，请检查网络连接");
+      throw new Error(t("errors.networkRequestFailed"));
     }
     throw error;
   }
