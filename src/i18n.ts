@@ -1,11 +1,11 @@
-export const SUPPORTED_LOCALES = ["zh-TW", "zh-CN", "en"] as const;
+export const SUPPORTED_LOCALES = ["en", "zh-TW", "zh-CN"] as const;
 
 export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 
 export const UI_LANGUAGE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
   "zh-TW": "繁體中文",
   "zh-CN": "简体中文",
-  en: "English",
 };
 
 export const HORIZONTAL_POSITION_KEYS = ["left", "right"] as const;
@@ -15,19 +15,19 @@ export type HorizontalPosition = typeof HORIZONTAL_POSITION_KEYS[number];
 export type VerticalPosition = typeof VERTICAL_POSITION_KEYS[number];
 
 const UI_LANGUAGE_LABEL_TO_LOCALE: Record<string, SupportedLocale> = {
-  "繁體中文": "zh-TW",
-  "繁体中文": "zh-TW",
-  "zh-TW": "zh-TW",
+  en: "en",
+  english: "en",
+  English: "en",
   "zh_tw": "zh-TW",
+  "zh-TW": "zh-TW",
   "zh-Hant": "zh-TW",
-  "简体中文": "zh-CN",
+  "繁体中文": "zh-TW",
+  "繁體中文": "zh-TW",
   "簡體中文": "zh-CN",
+  "简体中文": "zh-CN",
+  "zh-Hans": "zh-CN",
   "zh-CN": "zh-CN",
   "zh_cn": "zh-CN",
-  "zh-Hans": "zh-CN",
-  English: "en",
-  english: "en",
-  en: "en",
 };
 
 type Dictionary = {
@@ -126,6 +126,100 @@ type Dictionary = {
 };
 
 const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
+  en: {
+    settings: {
+      language: {
+        title: "Interface Language",
+        description: "Set the plugin UI and message language.",
+      },
+      translationService: {
+        title: "Translation Service",
+        description: "Choose the translation service to use.",
+      },
+      targetLanguage: {
+        title: "Target Language",
+      },
+      apiKey: {
+        title: "API Key",
+      },
+      panelHorizontalPosition: {
+        title: "Panel Horizontal Position",
+        description: "Choose whether the translation panel appears on the left or right side of the PDF viewer.",
+      },
+      panelVerticalPosition: {
+        title: "Panel Vertical Position",
+        description: "Choose whether the translation panel appears at the top or bottom of the PDF viewer.",
+      },
+      panelHorizontalMargin: {
+        title: "Panel Horizontal Margin",
+        description: "Set the distance between the translation panel and the left or right edge of the PDF viewer.",
+      },
+      panelVerticalMargin: {
+        title: "Panel Vertical Margin",
+        description: "Set the distance between the translation panel and the top or bottom edge of the PDF viewer.",
+      },
+      panelWidthRatio: {
+        title: "Panel Width Ratio",
+        description: "Set the panel width as a ratio of the PDF area width, from 0.1 to 1.0.",
+      },
+      panelHeightRatio: {
+        title: "Panel Height Ratio",
+        description: "Set the panel height as a ratio of the PDF area height, from 0.1 to 1.0.",
+      },
+    },
+    translationServices: {
+      google: "Google",
+      baidu: "Baidu🔐",
+      youdao: "Youdao🔐",
+    },
+    positions: {
+      left: "Left",
+      right: "Right",
+      top: "Top",
+      bottom: "Bottom",
+    },
+    targetLanguageDescriptions: {
+      google: "Enter a target language code such as zh-CN. See https://docs.cloud.google.com/translate/docs/languages",
+      baidu: "Enter a target language code such as zh. For domain translation, use \"languageCode&domain\".\n\nSee https://fanyi-api.baidu.com/product/113 and https://fanyi-api.baidu.com/product/123",
+      youdao: "Enter a target language code such as zh-CHS. For domain translation, use \"languageCode&domain\".\n\nSee https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
+    },
+    apiKeyDescriptions: {
+      google: "The Google free endpoint does not require an API key.",
+      baidu: "Enter APP ID and secret in the format APP ID&secret. See https://fanyi-api.baidu.com/manage/developer",
+      youdao: "Enter app ID and app secret in the format app ID&app secret. See https://ai.youdao.com/console",
+    },
+    menu: {
+      translate: "Translate",
+    },
+    panel: {
+      placeholder: "Select text in the PDF to show the translation here.",
+      title: "Translation",
+      decreaseFont: "Decrease font size",
+      increaseFont: "Increase font size",
+      loading: "Translating...",
+      buttonTitle: "PDF Translator",
+    },
+    notifications: {
+      translatorEnabled: "PDF translator enabled.",
+      translatorDisabled: "PDF translator disabled.",
+      translatorEnableFailed: "Failed to enable PDF translator.",
+      pdfViewerNotFound: "PDF viewer not found.",
+    },
+    errors: {
+      emptyText: "No text to translate.",
+      baiduMissingApiKey: "Set the Baidu APP ID and secret in settings first.",
+      baiduInvalidApiKey: "Invalid Baidu API key format. Use APP ID&secret.",
+      youdaoMissingApiKey: "Set the Youdao app ID and app secret in settings first.",
+      youdaoInvalidApiKey: "Invalid Youdao API key format. Use app ID&app secret.",
+      unknownTranslationError: "Unknown translation error",
+      translationFailedPrefix: "Translation failed: {message}",
+      requestFailed: "Request failed: {status}",
+      invalidTranslationResult: "Invalid translation result.",
+      networkRequestFailed: "Network request failed. Check your connection and try again.",
+      baiduApiErrorPrefix: "Baidu translation error {code}: {message}",
+      youdaoApiErrorPrefix: "Youdao translation error {code}",
+    },
+  },
   "zh-TW": {
     settings: {
       language: {
@@ -148,7 +242,7 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
       },
       panelVerticalPosition: {
         title: "面板垂直位置",
-        description: "設定翻譯面板顯示在 PDF 檢視區的上方或下方。",
+        description: "設定翻譯面板顯示在 PDF 檢視區的頂部或底部。",
       },
       panelHorizontalMargin: {
         title: "面板水平邊距",
@@ -169,24 +263,24 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
     },
     translationServices: {
       google: "Google",
-      baidu: "百度翻譯",
-      youdao: "有道翻譯",
+      baidu: "百度🔐",
+      youdao: "有道🔐",
     },
     positions: {
       left: "左側",
       right: "右側",
-      top: "上方",
-      bottom: "下方",
+      top: "頂部",
+      bottom: "底部",
     },
     targetLanguageDescriptions: {
-      google: "請輸入目標語言代碼，例如 zh-CN。可參考 https://docs.cloud.google.com/translate/docs/languages",
-      baidu: "請輸入目標語言代碼，例如 zh。若要使用領域翻譯，請輸入「語言代碼&領域」，可參考 https://fanyi-api.baidu.com/product/113 與 https://fanyi-api.baidu.com/product/123",
-      youdao: "請輸入目標語言代碼，例如 zh-CHS。若要使用領域翻譯，請輸入「語言代碼&領域」，可參考 https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
+      google: "請輸入目標語言代碼，例如 zh-CN。見：https://docs.cloud.google.com/translate/docs/languages",
+      baidu: "請輸入目標語言代碼，例如 zh。若要使用領域翻譯，請輸入「語言代碼&領域」，\n\n見：https://fanyi-api.baidu.com/product/113 與 https://fanyi-api.baidu.com/product/123",
+      youdao: "請輸入目標語言代碼，例如 zh-CHS。若要使用領域翻譯，請輸入「語言代碼&領域」，\n\n見：https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
     },
     apiKeyDescriptions: {
       google: "Google 免費介面不需要 API Key。",
-      baidu: "請輸入 APP ID 與密鑰，格式為 APP ID&密鑰。可參考 https://fanyi-api.baidu.com/manage/developer",
-      youdao: "請輸入應用 ID 與應用密鑰，格式為應用 ID&應用密鑰。可參考 https://ai.youdao.com/console",
+      baidu: "請輸入 APP ID 與密鑰，格式為 APP ID&密鑰。見：https://fanyi-api.baidu.com/manage/developer",
+      youdao: "請輸入應用 ID 與應用密鑰，格式為應用 ID&應用密鑰。見：https://ai.youdao.com/console",
     },
     menu: {
       translate: "翻譯",
@@ -242,7 +336,7 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
       },
       panelVerticalPosition: {
         title: "面板垂直位置",
-        description: "设置翻译面板显示在 PDF 视图区的上方或下方。",
+        description: "设置翻译面板显示在 PDF 视图区的顶部或底部。",
       },
       panelHorizontalMargin: {
         title: "面板水平边距",
@@ -263,24 +357,24 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
     },
     translationServices: {
       google: "Google",
-      baidu: "百度翻译",
-      youdao: "有道翻译",
+      baidu: "百度🔐",
+      youdao: "有道🔐",
     },
     positions: {
       left: "左侧",
       right: "右侧",
-      top: "上方",
-      bottom: "下方",
+      top: "顶部",
+      bottom: "底部",
     },
     targetLanguageDescriptions: {
-      google: "请输入目标语言代码，例如 zh-CN。可参考 https://docs.cloud.google.com/translate/docs/languages",
-      baidu: "请输入目标语言代码，例如 zh。若要使用领域翻译，请输入“语言代码&领域”，可参考 https://fanyi-api.baidu.com/product/113 与 https://fanyi-api.baidu.com/product/123",
-      youdao: "请输入目标语言代码，例如 zh-CHS。若要使用领域翻译，请输入“语言代码&领域”，可参考 https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
+      google: "请输入目标语言代码，例如 zh-CN。见：https://docs.cloud.google.com/translate/docs/languages",
+      baidu: "请输入目标语言代码，例如 zh。若要使用领域翻译，请输入“语言代码&领域”，\n\n见：https://fanyi-api.baidu.com/product/113 与 https://fanyi-api.baidu.com/product/123",
+      youdao: "请输入目标语言代码，例如 zh-CHS。若要使用领域翻译，请输入“语言代码&领域”，\n\n见：https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
     },
     apiKeyDescriptions: {
       google: "Google 免费接口不需要 API Key。",
-      baidu: "请输入 APP ID 与密钥，格式为 APP ID&密钥。可参考 https://fanyi-api.baidu.com/manage/developer",
-      youdao: "请输入应用 ID 与应用密钥，格式为应用 ID&应用密钥。可参考 https://ai.youdao.com/console",
+      baidu: "请输入 APP ID 与密钥，格式为 APP ID&密钥。见：https://fanyi-api.baidu.com/manage/developer",
+      youdao: "请输入应用 ID 与应用密钥，格式为应用 ID&应用密钥。见：https://ai.youdao.com/console",
     },
     menu: {
       translate: "翻译",
@@ -312,100 +406,6 @@ const DICTIONARIES: Record<SupportedLocale, Dictionary> = {
       networkRequestFailed: "网络请求失败，请检查连接后重试。",
       baiduApiErrorPrefix: "百度翻译错误 {code}: {message}",
       youdaoApiErrorPrefix: "有道翻译错误 {code}",
-    },
-  },
-  en: {
-    settings: {
-      language: {
-        title: "Interface Language",
-        description: "Set the plugin UI and message language.",
-      },
-      translationService: {
-        title: "Translation Service",
-        description: "Choose the translation service to use.",
-      },
-      targetLanguage: {
-        title: "Target Language",
-      },
-      apiKey: {
-        title: "API Key",
-      },
-      panelHorizontalPosition: {
-        title: "Panel Horizontal Position",
-        description: "Choose whether the translation panel appears on the left or right side of the PDF viewer.",
-      },
-      panelVerticalPosition: {
-        title: "Panel Vertical Position",
-        description: "Choose whether the translation panel appears at the top or bottom of the PDF viewer.",
-      },
-      panelHorizontalMargin: {
-        title: "Panel Horizontal Margin",
-        description: "Set the distance between the translation panel and the left or right edge of the PDF viewer.",
-      },
-      panelVerticalMargin: {
-        title: "Panel Vertical Margin",
-        description: "Set the distance between the translation panel and the top or bottom edge of the PDF viewer.",
-      },
-      panelWidthRatio: {
-        title: "Panel Width Ratio",
-        description: "Set the panel width as a ratio of the PDF area width, from 0.1 to 1.0.",
-      },
-      panelHeightRatio: {
-        title: "Panel Height Ratio",
-        description: "Set the panel height as a ratio of the PDF area height, from 0.1 to 1.0.",
-      },
-    },
-    translationServices: {
-      google: "Google",
-      baidu: "Baidu",
-      youdao: "Youdao",
-    },
-    positions: {
-      left: "Left",
-      right: "Right",
-      top: "Top",
-      bottom: "Bottom",
-    },
-    targetLanguageDescriptions: {
-      google: "Enter a target language code such as zh-CN. See https://docs.cloud.google.com/translate/docs/languages",
-      baidu: "Enter a target language code such as zh. For domain translation, use \"languageCode&domain\". See https://fanyi-api.baidu.com/product/113 and https://fanyi-api.baidu.com/product/123",
-      youdao: "Enter a target language code such as zh-CHS. For domain translation, use \"languageCode&domain\". See https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html",
-    },
-    apiKeyDescriptions: {
-      google: "The Google free endpoint does not require an API key.",
-      baidu: "Enter APP ID and secret in the format APP ID&secret. See https://fanyi-api.baidu.com/manage/developer",
-      youdao: "Enter app ID and app secret in the format app ID&app secret. See https://ai.youdao.com/console",
-    },
-    menu: {
-      translate: "Translate",
-    },
-    panel: {
-      placeholder: "Select text in the PDF to show the translation here.",
-      title: "Translation",
-      decreaseFont: "Decrease font size",
-      increaseFont: "Increase font size",
-      loading: "Translating...",
-      buttonTitle: "PDF Translator",
-    },
-    notifications: {
-      translatorEnabled: "PDF translator enabled.",
-      translatorDisabled: "PDF translator disabled.",
-      translatorEnableFailed: "Failed to enable PDF translator.",
-      pdfViewerNotFound: "PDF viewer not found.",
-    },
-    errors: {
-      emptyText: "No text to translate.",
-      baiduMissingApiKey: "Set the Baidu APP ID and secret in settings first.",
-      baiduInvalidApiKey: "Invalid Baidu API key format. Use APP ID&secret.",
-      youdaoMissingApiKey: "Set the Youdao app ID and app secret in settings first.",
-      youdaoInvalidApiKey: "Invalid Youdao API key format. Use app ID&app secret.",
-      unknownTranslationError: "Unknown translation error",
-      translationFailedPrefix: "Translation failed: {message}",
-      requestFailed: "Request failed: {status}",
-      invalidTranslationResult: "Invalid translation result.",
-      networkRequestFailed: "Network request failed. Check your connection and try again.",
-      baiduApiErrorPrefix: "Baidu translation error {code}: {message}",
-      youdaoApiErrorPrefix: "Youdao translation error {code}",
     },
   },
 };
